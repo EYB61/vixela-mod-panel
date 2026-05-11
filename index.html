@@ -1,1 +1,48 @@
-BLA BLA
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vixela Mod Panel</title>
+    <style>
+        body { background: #0b0b0b; color: #ff0000; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-card { background: #151515; padding: 30px; border: 2px solid #ff0000; border-radius: 15px; box-shadow: 0 0 20px rgba(255,0,0,0.2); }
+        input { display: block; width: 250px; margin: 15px 0; padding: 12px; background: #222; border: 1px solid #444; color: white; border-radius: 5px; }
+        button { width: 100%; padding: 12px; background: #ff0000; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #b30000; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2 style="text-align:center">VIXELA ADMIN</h2>
+        <input type="text" id="user" placeholder="Kullanıcı Adı">
+        <input type="password" id="pass" placeholder="Şifre">
+        <button onclick="baglan()">SİSTEME GİRİŞ YAP</button>
+    </div>
+
+    <script>
+        async function baglan() {
+            const u = document.getElementById('user').value;
+            const p = document.getElementById('pass').value;
+            
+            // DİKKAT: Buradaki URL, senin Ngrok'tan aldığın URL olacak!
+            const API_URL = "https://SENIN-TUNEL-ADRESIN.ngrok-free.app"; 
+
+            try {
+                const response = await fetch(`${API_URL}/api/login`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({user: u, pass: p})
+                });
+                const data = await response.json();
+                if(data.success) {
+                    alert("Hoşgeldin! Panel yükleniyor...");
+                    // Burada admin paneli içeriğini gösterebilirsin
+                } else {
+                    alert("Yetkisiz Giriş!");
+                }
+            } catch (err) {
+                alert("Botun API'sine bağlanılamadı! Botun açık mı?");
+            }
+        }
+    </script>
+</body>
+</html>
