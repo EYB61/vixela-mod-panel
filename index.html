@@ -3,29 +3,59 @@
 <head>
     <title>Vixela Mod Panel</title>
     <style>
-        body { background-image: url('https://eyb61.github.io/vixela-mod-panel/Vixela%20Banner.gif'); background-size: cover; display: flex; justify-content: center; align-items: center; height: 100vh; margin:0; font-family: sans-serif; }
-        .card { background: rgba(0,0,0,0.85); padding: 40px; border: 2px solid red; border-radius: 20px; backdrop-filter: blur(10px); text-align: center; width: 300px; }
+        body { background-image: url('https://eyb61.github.io/vixela-mod-panel/Vixela%20Banner.gif'); background-size: cover; background-attachment: fixed; color: white; font-family: sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .box { background: rgba(0,0,0,0.9); padding: 30px; border: 2px solid red; border-radius: 15px; text-align: center; backdrop-filter: blur(5px); }
         input { width: 100%; padding: 12px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; box-sizing: border-box; }
         button { width: 100%; padding: 12px; background: red; color: white; border: none; cursor: pointer; font-weight: bold; }
+        .hidden { display: none; }
+        .panel-content { width: 800px; display: flex; flex-wrap: wrap; justify-content: center; }
+        .card { background: #111; border: 1px solid red; padding: 20px; margin: 10px; width: 250px; border-radius: 10px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2 style="color:red">MOD PANEL</h2>
-        <input type="text" id="u" placeholder="Kullanıcı Adı">
+    <div id="loginArea" class="box">
+        <h2>MOD GİRİŞ</h2>
+        <input type="text" id="u" placeholder="Admin ID">
         <input type="password" id="p" placeholder="Şifre">
-        <button onclick="login()">GİRİŞ YAP</button>
+        <button onclick="checkLogin()">GİRİŞ YAP</button>
     </div>
+
+    <div id="panelArea" class="hidden panel-content">
+        <div class="card">
+            <h3>💰 EKONOMİ</h3>
+            <input type="text" id="tid" placeholder="Kullanıcı ID">
+            <input type="number" id="tval" placeholder="Miktar">
+            <button onclick="action('para-ekle')">PARA EKLE</button>
+        </div>
+        <div class="card">
+            <h3>⚖️ MODERASYON</h3>
+            <input type="text" id="mid" placeholder="Kullanıcı ID">
+            <button onclick="action('jail-at')">JAIL AT</button>
+        </div>
+    </div>
+
     <script>
-        async function login() {
-            const user = document.getElementById('u').value;
-            const pass = document.getElementById('p').value;
-            const res = await fetch('https://SENIN-NGROK-ADRESIN.ngrok-free.app/api/login-mod', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({user, pass})
+        const API = "https://SENIN-NGROK-LINKIN.ngrok-free.app"; // Burayı güncelle
+
+        function checkLogin() {
+            if(document.getElementById('u').value === "Vixela-Roleplay" && document.getElementById('p').value === "vixelarp2026") {
+                document.getElementById('loginArea').classList.add('hidden');
+                document.getElementById('panelArea').classList.remove('hidden');
+            } else { alert("Hatalı!"); }
+        }
+
+        async function action(c) {
+            const res = await fetch(`${API}/api/action`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    cmd: c, 
+                    target: document.getElementById('tid').value || document.getElementById('mid').value,
+                    val: document.getElementById('tval').value
+                })
             });
             const data = await res.json();
-            if(data.success) window.location.href = "panel.html"; else alert("Hatalı!");
+            alert(data.message);
         }
     </script>
 </body>
