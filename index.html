@@ -1,47 +1,149 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
-    <title>Vixela Mod Panel</title>
+    <meta charset="UTF-8">
+    <title>Vixela Yönetim Paneli</title>
     <style>
-        body { background: #0b0b0b; color: #ff0000; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-card { background: #151515; padding: 30px; border: 2px solid #ff0000; border-radius: 15px; box-shadow: 0 0 20px rgba(255,0,0,0.2); }
-        input { display: block; width: 250px; margin: 15px 0; padding: 12px; background: #222; border: 1px solid #444; color: white; border-radius: 5px; }
-        button { width: 100%; padding: 12px; background: #ff0000; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #b30000; }
+        body {
+            background-image: url('https://eyb61.github.io/vixela-mod-panel/Vixela%20Banner.gif');
+            background-size: cover;
+            background-attachment: fixed;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+        }
+
+        .overlay {
+            background: rgba(0, 0, 0, 0.85);
+            min-height: 100vh;
+            backdrop-filter: blur(8px);
+        }
+
+        nav {
+            background: rgba(255, 0, 0, 0.1);
+            border-bottom: 2px solid #ff0000;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+            justify-content: center;
+        }
+
+        .card {
+            background: rgba(30, 30, 30, 0.9);
+            border: 1px solid #ff0000;
+            border-radius: 10px;
+            width: 300px;
+            margin: 15px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(255,0,0,0.1);
+        }
+
+        h3 { color: #ff0000; border-bottom: 1px solid #333; padding-bottom: 10px; }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background: #222;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #ff0000;
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            border-radius: 5px;
+        }
+
+        button:hover { background: #b30000; transform: scale(1.02); }
+
+        .log-box {
+            width: 90%;
+            max-width: 1000px;
+            background: #000;
+            height: 200px;
+            overflow-y: scroll;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 13px;
+            border: 1px solid #333;
+        }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <h2 style="text-align:center">VIXELA ADMIN</h2>
-        <input type="text" id="user" placeholder="Kullanıcı Adı">
-        <input type="password" id="pass" placeholder="Şifre">
-        <button onclick="baglan()">SİSTEME GİRİŞ YAP</button>
+    <div class="overlay">
+        <nav>
+            <h1>VIXELA ROLEPLAY MANAGEMENT</h1>
+            <p>Admin: <span id="adminName">Yükleniyor...</span></p>
+        </nav>
+
+        <div class="container">
+            <div class="card">
+                <h3>💰 Ekonomi Yönetimi</h3>
+                <input type="text" id="targetId" placeholder="Discord ID">
+                <input type="number" id="amount" placeholder="Miktar">
+                <button onclick="sendAction('para-ekle')">Para Ekle</button>
+                <button onclick="sendAction('para-sil')" style="margin-top:5px; background:#444;">Para Sil</button>
+            </div>
+
+            <div class="card">
+                <h3>🏦 Maaş Sistemi</h3>
+                <button onclick="sendAction('maas-yatir')">Tüm Maaşları Yatır</button>
+                <input type="text" id="roleName" placeholder="Meslek Adı">
+                <input type="number" id="roleSal" placeholder="Maaş Tutarı">
+                <button onclick="sendAction('maas-ekle')" style="background:#28a745;">Yeni Meslek Tanımla</button>
+            </div>
+
+            <div class="card">
+                <h3>⚖️ Moderasyon</h3>
+                <input type="text" id="modTarget" placeholder="Kullanıcı ID">
+                <input type="text" id="reason" placeholder="Sebep">
+                <button onclick="sendAction('jail-at')">Zindana At</button>
+                <button onclick="sendAction('mute')" style="margin-top:5px;">Sustur (Mute)</button>
+            </div>
+        </div>
+
+        <div style="display:flex; justify-content:center; padding-bottom: 50px;">
+            <div class="log-box" id="logs">
+                [Sistem]: Bot bağlantısı bekleniyor...<br>
+            </div>
+        </div>
     </div>
 
     <script>
-        async function baglan() {
-            const u = document.getElementById('user').value;
-            const p = document.getElementById('pass').value;
-            
-            // DİKKAT: Buradaki URL, senin Ngrok'tan aldığın URL olacak!
-            const API_URL = "https://SENIN-TUNEL-ADRESIN.ngrok-free.app"; 
+        const API_URL = "https://SENIN-TUNEL-ADRESIN.ngrok-free.app";
 
-            try {
-                const response = await fetch(`${API_URL}/api/login`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({user: u, pass: p})
-                });
-                const data = await response.json();
-                if(data.success) {
-                    alert("Hoşgeldin! Panel yükleniyor...");
-                    // Burada admin paneli içeriğini gösterebilirsin
-                } else {
-                    alert("Yetkisiz Giriş!");
-                }
-            } catch (err) {
-                alert("Botun API'sine bağlanılamadı! Botun açık mı?");
-            }
+        async function sendAction(command) {
+            const data = {
+                cmd: command,
+                target: document.getElementById('targetId')?.value || document.getElementById('modTarget')?.value,
+                val: document.getElementById('amount')?.value || document.getElementById('roleSal')?.value,
+                extra: document.getElementById('roleName')?.value || document.getElementById('reason')?.value
+            };
+
+            const response = await fetch(`${API_URL}/api/action`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            const logBox = document.getElementById('logs');
+            logBox.innerHTML += `[${new Date().toLocaleTimeString()}]: ${result.message}<br>`;
+            logBox.scrollTop = logBox.scrollHeight;
         }
     </script>
 </body>
